@@ -48,13 +48,14 @@
         (progn
           (pyvenv-activate envpath)
           (setq-local flycheck-python-flake8-executable (executable-find "flake8"))
-          (setq-local flycheck-flake8rc (concat venv "setup.cfg")))
+          (if (f-exists? (concat venv "setup.cfg"))
+              (setq-local flycheck-flake8rc (concat venv "setup.cfg"))))
       (progn
         (pyvenv-deactivate)
         (exec-path-from-shell-initialize)
         (setq-local flycheck-python-flake8-executable (executable-find "flake8"))
-        (setq-local flycheck-flake8rc (expand-file-name "~/.config/flake8"))
-        )
+        (if (f-exists? (expand-file-name "~/.config/flake8"))
+            (setq-local flycheck-flake8rc (expand-file-name "~/.config/flake8"))))
       )))
 
 (add-hook 'flycheck-before-syntax-check-hook
