@@ -38,9 +38,10 @@
 
 (defun flycheck-local-flake8/get-venv-from-project-path (projectpath)
   "Calc env path from project path"
-  (f-join (expand-file-name (getenv "WORKON_HOME"))
+  (f-join (expand-file-name (pyvenv-workon-home))
           (car (last (split-string projectpath "/")))))
 
+;;;###autoload
 (defun flycheck-local-flake8/flycheck-virtualenv-set-python-executables ()
   (let* ((venv (expand-file-name (vc-git-root (buffer-file-name))))
          (envpath (flycheck-local-flake8/get-venv-from-project-path (substring venv 0 -1))))
