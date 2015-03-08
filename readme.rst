@@ -17,4 +17,7 @@ Make sure that package avaialble for emacs, and to your init.el
 Check:
 ------
 
-Run `C-c ! v` in python-file buffer and see that flake8 imported from virtualenv.
+Run ``C-c ! v`` in python-file buffer and see that flake8 imported from virtualenv.
+
+.. image:: http://i.imgur.com/dm8vkou.png
+   alt: screenshot of flycheck enabled checkers
