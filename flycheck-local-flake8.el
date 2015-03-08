@@ -1,11 +1,11 @@
-;;; flycheck-local-flake8.el --- Flycheck plugin for flake8 to start with venv and local setup.cfg
+;;; flycheck-local-flake8.el --- Flycheck plugin for flake8 to use venv and local setup.cfg
 
 ;; Copyright © 2015 Rustem Muslimov
 ;;
 ;; Author:     Rustem Muslimov <r.muslimov@gmail.com>
 ;; Version:    0.0.1
 ;; Keywords:   flycheck, flake8, virtualenv
-;; Package-Requires: ((f "0.17.2"))
+;; Package-Requires: ((f "0.17.2") (exec-path-from-shell) (flycheck "0.23-cvs") (pyvenv "1.6"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -59,9 +59,6 @@
         (if (f-exists? (expand-file-name "~/.config/flake8"))
             (setq-local flycheck-flake8rc (expand-file-name "~/.config/flake8"))))
       )))
-
-(add-hook 'flycheck-before-syntax-check-hook
-          #'flycheck-local-flake8/flycheck-virtualenv-set-python-executables 'local)
 
 (provide 'flycheck-local-flake8)
 
