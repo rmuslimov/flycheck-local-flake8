@@ -43,7 +43,8 @@
 
 ;;;###autoload
 (defun flycheck-local-flake8/flycheck-virtualenv-set-python-executables ()
-  (let* ((venv (expand-file-name (vc-git-root (buffer-file-name))))
+  (let* ((venv (expand-file-name
+                (or (vc-git-root (buffer-file-name)) (f-dirname (buffer-file-name)))))
          (envpath (flycheck-local-flake8/get-venv-from-project-path (substring venv 0 -1))))
     (if (file-exists-p envpath)
         (progn
