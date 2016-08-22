@@ -5,7 +5,7 @@
 ;; Author:     Rustem Muslimov <r.muslimov@gmail.com>
 ;; Version:    0.0.1
 ;; Keywords:   flycheck, flake8, virtualenv
-;; Package-Requires: ((f "0.17.2") (exec-path-from-shell) (flycheck "0.23-cvs") (pyvenv "1.6"))
+;; Package-Requires: ((f "0.17.2") (flycheck "0.23-cvs"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -31,34 +31,36 @@
 
 ;;; Code:
 
-(require 'exec-path-from-shell)
 (require 'f)
 (require 'flycheck)
-(require 'pyvenv)
+
 
 (defun flycheck-local-flake8/get-venv-from-project-path (projectpath)
-  "Calc env path from project path"
-  (f-join (expand-file-name (pyvenv-workon-home))
-          (car (last (split-string projectpath "/")))))
+  "Get env path based on folder, of no venv, assume that venv name same as foldername."
+  (if (f-exists? (f-join projectpath "venv"))
+	  (f-join projectpath "venv")
+	(let ((workon-home (or (getenv "WORKON_HOME") "~/.virtualenvs")))
+	  (f-join (expand-file-name workon-home)
+			  (car (last (split-string projectpath "/")))))))
+
+(defun flycheck-local-flake8--get-flake8-from-envpath (envpath)
+  (let ((local-flake8 (f-join envpath "bin" "flake8")))
+	(if (f-exists? local-flake8) local-flake8 (executable-find "flake8"))))
 
 ;;;###autoload
 (defun flycheck-local-flake8/flycheck-virtualenv-set-python-executables ()
   (let* ((venv (expand-file-name
                 (or (vc-git-root (buffer-file-name)) (f-dirname (buffer-file-name)))))
          (envpath (flycheck-local-flake8/get-venv-from-project-path (substring venv 0 -1))))
-    (if (file-exists-p envpath)
+    (if (f-exists? envpath)
         (progn
-          (pyvenv-activate envpath)
-          (setq-local flycheck-python-flake8-executable (executable-find "flake8"))
+          (setq-local flycheck-python-flake8-executable (flycheck-local-flake8--get-flake8-from-envpath envpath))
           (if (f-exists? (concat venv "setup.cfg"))
               (setq-local flycheck-flake8rc (concat venv "setup.cfg"))))
       (progn
-        (pyvenv-deactivate)
-        (exec-path-from-shell-initialize)
-        (setq-local flycheck-python-flake8-executable (executable-find "flake8"))
+		(executable-find "flake8")
         (if (f-exists? (expand-file-name "~/.config/flake8"))
-            (setq-local flycheck-flake8rc (expand-file-name "~/.config/flake8"))))
-      )))
+            (setq-local flycheck-flake8rc (expand-file-name "~/.config/flake8")))))))
 
 (provide 'flycheck-local-flake8)
 
